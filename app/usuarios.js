@@ -1,7 +1,8 @@
 const db = require("../conf/database");
 const conn = db.connecion();
-//const seq;
+
 module.exports = {
+    //User Model
     User: () => {
         return conn.define("usuarios", {
             id: {
@@ -15,7 +16,11 @@ module.exports = {
             correo: db.sequelize.STRING,
             password: db.sequelize.STRING,
             token: db.sequelize.STRING,
-            ultimoAcceso: db.sequelize.DATE
-        });
+            ultimoAcceso: db.sequelize.DATE,
+        },
+        {
+            paranoid: true,
+        }
+        );
     }
 }
