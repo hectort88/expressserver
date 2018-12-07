@@ -1,6 +1,7 @@
 require('dotenv').config();
 const port = process.env.port || 3000;
 const express = require("express");
+const bodyParser = require("body-parser");
 const usersRouter = require("./routes/usuarios");
 const app = express();
 const conexion = require("./conf/database").connecion();
@@ -11,8 +12,10 @@ app.get("/", (request, response) => {
     response.send({ "Nietzsche": nietzsche.getQuote(nietzsche.quotes) });
 });
 
-//Ruta de la api
-app.use("/api", usersRouter);
+//Ruta de la api y parser
+app.use(bodyParser.json())
+   .use(bodyParser.urlencoded({ extended: true }))
+   .use("/api", usersRouter);
 
 //Verificar Conexion
 conexion.authenticate()
