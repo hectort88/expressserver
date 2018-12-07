@@ -12,5 +12,6 @@ module.exports = {
             password: process.env.db_pass,
             operatorsAliases: false
         })
-    }
+    },
+    sequelize: Sequelize
 }
