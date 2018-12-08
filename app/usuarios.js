@@ -1,5 +1,6 @@
 const db = require("../conf/database");
 const conn = db.connect();
+const bcrypt = require('bcrypt');
 
 module.exports = {
     //User Model
@@ -45,6 +46,11 @@ module.exports = {
         },
         {
             paranoid: true,
-        });
+            hooks: {
+                beforeCreate: (user) => {
+                    user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(10));
+                }
+            }
+        });        
     }
 }

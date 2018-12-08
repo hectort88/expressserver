@@ -4,6 +4,7 @@ const usersRouter = express.Router();
 const usersController = require("../app/http/controller/UsuarioController")(User);
 
 usersRouter.use("/users", (req, res, next) => {
+    if (req.method === 'POST') return next();
     let token = req.body.token || req.query.token || req.headers['x-access-token'];
     if (!token) return res.status(401).json({error: "Unauthorized"});    
     next();

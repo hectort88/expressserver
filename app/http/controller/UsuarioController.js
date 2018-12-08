@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+
 const hideData = (elem) => {
     if (elem === null) return elem;
     elem.password = undefined;
@@ -14,9 +16,8 @@ const isAdmin = (token, UserModel) => {
     })
 }
 
-const areCredentialsOk = (user, req) => {
-    
-    return true;
+const isValidPassword = (password, user) => {
+    return bcrypt.compareSync(password, user.password)
 }
 
 module.exports = UserModel => { return {
@@ -30,7 +31,7 @@ module.exports = UserModel => { return {
     auth: (req, res) => {
         UserModel.findOne({where: {correo: req.body.correo}}).then(user => {
             if (user === null) return res.status(401).json({error: "Unauthorized"});
-            if (areCredentialsOk(user, req)) {
+            if (isValidPassword(req.body.password, user)) {
                 token = "abc";
                 user.token = token;
                 user.save();
@@ -43,7 +44,6 @@ module.exports = UserModel => { return {
     create: (req, res) => {
         if (req.body.id) req.body.id = undefined;
         let user = UserModel.build(req.body);
-        console.log(user);
         user.save()
             .then(user => res.json(hideData(user)))
             .catch(error => {
