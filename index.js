@@ -4,21 +4,21 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const usersRouter = require("./routes/usuarios");
 const app = express();
-const conexion = require("./conf/database").connecion();
+const dbconn = require("./conf/database").connect();
+const cors = require("cors");
 
 //Ruta de prueba
 const nietzsche = require("./app/nietzsche");
+app.use(cors());
 app.get("/", (request, response) => {
     response.send({ "Nietzsche": nietzsche.getQuote(nietzsche.quotes) });
 });
 
 //Ruta de la api y parser
-app.use(bodyParser.json())
-   .use(bodyParser.urlencoded({ extended: true }))
-   .use("/api", usersRouter);
+app.use(bodyParser.json()).use("/api", usersRouter);
 
 //Verificar Conexion
-conexion.authenticate()
+dbconn.authenticate()
         .then(() => console.log("Conectado a la base de datos"))
         .error((err) => console.error("Error de conexion:", err));
 
