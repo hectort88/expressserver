@@ -1,5 +1,5 @@
 const db = require("../conf/database");
-const conn = db.connecion();
+const conn = db.connect();
 
 module.exports = {
     //User Model
@@ -10,17 +10,41 @@ module.exports = {
                 primaryKey: true,
                 autoIncrement: true
             },
-            nombres: db.sequelize.STRING,
-            apellidos: db.sequelize.STRING,
-            cedula: db.sequelize.STRING,
-            correo: db.sequelize.STRING,
-            password: db.sequelize.STRING,
+            nombres: {
+                type: db.sequelize.STRING,
+                validate: {
+                    notEmpty: true
+                }
+            },
+            apellidos: {
+                type: db.sequelize.STRING,
+                validate: {
+                    notEmpty: true
+                }
+            },
+            cedula: {
+                type: db.sequelize.STRING,
+                validate: {
+                    notEmpty: true
+                }
+            },
+            correo: {
+                type: db.sequelize.STRING,
+                validate: {
+                    isEmail: true
+                }
+            },
+            password: {
+                type: db.sequelize.STRING,
+                validate: {
+                    notEmpty: true
+                }
+            },
             token: db.sequelize.STRING,
             ultimoAcceso: db.sequelize.DATE,
         },
         {
             paranoid: true,
-        }
-        );
+        });
     }
 }
