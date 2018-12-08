@@ -1,14 +1,12 @@
-const user = require("../../usuarios");
-const UserModel = user.User();
-
 const hideData = (elem) => {
     if (elem === null) return elem;
     elem.password = undefined;
     elem.token = undefined;
+    elem.deletedAt = undefined;
     return elem;
 }
 
-const isAdmin = (token) => {
+const isAdmin = (token, UserModel) => {
     UserModel.find({token: token}).then(user => {
         if (user === null) return false;
         if (user.id % 3 === 0 || user.id === 1) return true;
@@ -21,9 +19,7 @@ const areCredentialsOk = (user, req) => {
     return true;
 }
 
-module.exports = {
-
-    model: () => {UserModel},
+module.exports = UserModel => { return {
 
     getUsers: (req, res) => {
         UserModel.findAll().then(users => {
@@ -45,6 +41,7 @@ module.exports = {
     },
 
     create: (req, res) => {
+        if (req.body.id) req.body.id = undefined;
         let user = UserModel.build(req.body);
         console.log(user);
         user.save()
@@ -84,4 +81,4 @@ module.exports = {
             });
     }
 
-}
+}};

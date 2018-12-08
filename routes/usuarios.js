@@ -1,14 +1,11 @@
 const express = require("express");
-const user = require("../app/usuarios");
-const User = user.User();
+const User = require("../app/usuarios").User();
 const usersRouter = express.Router();
-const usersController = require("../app/http/controller/UsuarioController");
+const usersController = require("../app/http/controller/UsuarioController")(User);
 
-usersRouter.use((req, res, next) => {
-    if (req.originalUrl !== "/api/auth") {
-        let token = req.body.token || req.query.token || req.headers['x-access-token'];
-        if (!token) return res.status(401).json({error: "Unauthorized"});
-    }
+usersRouter.use("/users", (req, res, next) => {
+    let token = req.body.token || req.query.token || req.headers['x-access-token'];
+    if (!token) return res.status(401).json({error: "Unauthorized"});    
     next();
 });
 
