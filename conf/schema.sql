@@ -20,14 +20,16 @@ USE `expressapp`;
 DROP TABLE IF EXISTS `usuarios`;
 CREATE TABLE IF NOT EXISTS `usuarios` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `nombres` varchar(100) DEFAULT NULL,
-  `apellidos` varchar(100) DEFAULT NULL,
-  `cedula` varchar(20) DEFAULT NULL,
+  `nombres` varchar(100) NOT NULL,
+  `apellidos` varchar(100) NOT NULL,
+  `cedula` varchar(20) NOT NULL,
   `correo` varchar(100) NOT NULL,
   `password` varchar(100) NOT NULL,
+  `token` varchar(100) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `ultimoAccedo` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `deletedAt` datetime DEFAULT NULL,
+  `ultimoAcceso` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `correo` (`correo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -2,7 +2,7 @@ require('dotenv').config();
 const Sequelize = require('sequelize');
 
 module.exports = {
-    connecion: () => {
+    connect: () => {
         return new Sequelize({
             dialect: 'mysql',
             port: process.env.db_port,
