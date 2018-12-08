@@ -1,13 +1,3 @@
-const bcrypt = require('bcrypt');
-
-const hideData = (elem) => {
-    if (elem === null) return elem;
-    elem.password = undefined;
-    elem.token = undefined;
-    elem.deletedAt = undefined;
-    return elem;
-}
-
 const isAdmin = (token, UserModel) => {
     UserModel.find({token: token}).then(user => {
         if (user === null) return false;
@@ -16,22 +6,20 @@ const isAdmin = (token, UserModel) => {
     })
 }
 
-const isValidPassword = (password, user) => {
-    return bcrypt.compareSync(password, user.password)
-}
-
-module.exports = UserModel => { return {
+module.exports = UserModel => { return { 
 
     getUsers: (req, res) => {
         UserModel.findAll().then(users => {
-            res.json(users.map(hideData))
+            res.json(users.map(user => {
+                return user.hideData(user);
+            }))
         });
     },
 
     auth: (req, res) => {
         UserModel.findOne({where: {correo: req.body.correo}}).then(user => {
             if (user === null) return res.status(401).json({error: "Unauthorized"});
-            if (isValidPassword(req.body.password, user)) {
+            if (user.isValidPassword(req.body.password, user)) {
                 token = "abc";
                 user.token = token;
                 user.save();
@@ -45,40 +33,29 @@ module.exports = UserModel => { return {
         if (req.body.id) req.body.id = undefined;
         let user = UserModel.build(req.body);
         user.save()
-            .then(user => res.json(hideData(user)))
-            .catch(error => {
-                console.error(error);
-                res.status(500).json({error: error});
-            });
+            .then(user => res.json(user.hideData(user)))
+            .catch(error => { res.status(500).json({error: error}); });
     },
 
     find: (req, res) => {
-        return res.json(hideData(req.user));        
+        return res.json(req.user.hideData(req.user));        
     },
 
     update: (req, res) => {
         let user = req.user;
-        user.nombres = req.body.nombres;
-        user.apellidos = req.body.apellidos;
-        user.correo = req.body.correo;
-        user.cedula = req.body.cedula;
+        user.nombres = req.body.nombres || user.nombres;
+        user.apellidos = req.body.apellidos || user.apellidos;
+        user.cedula = req.body.cedula || user.cedula;
         user.save()
-            .then(user => res.json(hideData(user)))
-            .catch(error => {
-                console.error(error);
-                res.status(500).json({error: error});
-            });
+            .then(user => res.json(req.user.hideData(user)))
+            .catch(error => { res.status(500).json({error: error}); });
     },
 
     delete: (req, res) => {
         let user = req.user;
         user.destroy({where: {id: req.params.id}})
-            .then(elem => {
-                res.status(204).end();
-            })
-            .catch(error => {
-                res.status(500).json({error: error});
-            });
+            .then(elem => { res.status(204).end(); })
+            .catch(error => { res.status(500).json({error: error});});
     }
 
 }};

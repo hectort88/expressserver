@@ -1,5 +1,5 @@
 const express = require("express");
-const User = require("../app/usuarios").User();
+const User = require("../app/usuarios").Model();
 const usersRouter = express.Router();
 const usersController = require("../app/http/controller/UsuarioController")(User);
 
