@@ -1,4 +1,5 @@
 const express = require("express");
+const jwt = require('jsonwebtoken');
 const User = require("../app/usuarios").Model;
 const usersRouter = express.Router();
 const usersController = require("../app/http/controller/UsuarioController")(User);
@@ -6,7 +7,13 @@ const usersController = require("../app/http/controller/UsuarioController")(User
 usersRouter.use("/users", (req, res, next) => {
     if (req.method === 'POST') return next(); //para crear usuario no requiere token
     let token = req.body.token || req.query.token || req.headers['x-access-token'];
-    if (!token) return res.status(401).json({error: "Unauthorized"});    
+    if (!token) return res.status(401).json({error: "Unauthorized"});
+    jwt.verify(token, process.env.jwt_secret, (err, decoded) => {
+        if (err) {
+            return res.status(401).json({error: "Unauthorized", message: err.message});
+        }
+        req.isAdmin = decoded.admin;
+    });
     next();
 });
 

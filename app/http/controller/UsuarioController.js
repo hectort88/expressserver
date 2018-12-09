@@ -1,9 +1,8 @@
-const isAdmin = (token, UserModel) => {
-    UserModel.find({token: token}).then(user => {
-        if (user === null) return false;
-        if (user.id % 3 === 0 || user.id === 1) return true;
-        return false;
-    })
+const jwt = require('jsonwebtoken');
+
+const isAdmin = (user) => {
+    if (user.id % 3 === 0 || user.id === 1) return true;
+    return false;
 }
 
 module.exports = UserModel => { return { 
@@ -17,13 +16,11 @@ module.exports = UserModel => { return {
     },
 
     auth: (req, res) => {
-        UserModel.findOne({where: {correo: req.body.correo}}).then(user => {
+        UserModel.findOne({where: {correo: req.body.correo, deletedAt: null}}).then(user => {
             if (user === null) return res.status(401).json({error: "Unauthorized"});
             if (user.isValidPassword(req.body.password, user)) {
-                token = "abc";
-                user.token = token;
-                user.save();
-                return res.json({token: token})
+                let token = jwt.sign({admin: isAdmin(user)}, process.env.jwt_secret);
+                return res.json({token: token});
             }
             return res.status(401).json({error: "Unauthorized"});
         })
@@ -43,19 +40,26 @@ module.exports = UserModel => { return {
 
     update: (req, res) => {
         let user = req.user;
-        user.nombres = req.body.nombres || user.nombres;
-        user.apellidos = req.body.apellidos || user.apellidos;
-        user.cedula = req.body.cedula || user.cedula;
-        user.save()
-            .then(user => res.json(req.user.hideData(user)))
-            .catch(error => { res.status(500).json({error: error}); });
+        if (req.isAdmin && !isAdmin(user)) {
+            user.nombres = req.body.nombres || user.nombres;
+            user.apellidos = req.body.apellidos || user.apellidos;
+            user.cedula = req.body.cedula || user.cedula;
+            user.save()
+                .then(user => res.json(req.user.hideData(user)))
+                .catch(error => res.status(500).json({error: error}));
+        }
+        return res.status(401).json({error: "Unauthorized"});
     },
 
     delete: (req, res) => {
         let user = req.user;
-        user.destroy({where: {id: req.params.id}})
-            .then(elem => { res.status(204).end(); })
-            .catch(error => { res.status(500).json({error: error});});
+        if (req.isAdmin && !isAdmin(user)) {
+            user.destroy({where: {id: req.params.id}})
+                .then(elem => { res.status(204).end({message: ok}); })
+                .catch(error => { res.status(500).json({error: error});});
+        } else {
+            return res.status(401).json({error: "Unauthorized"});
+        }
     }
 
 }};
