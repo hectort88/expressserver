@@ -28,6 +28,7 @@ const User = conn.define("usuarios", {
     },
     correo: {
         type: db.sequelize.STRING,
+        unique: true,
         validate: {
             isEmail: true
         }
@@ -63,5 +64,5 @@ User.prototype.hideData = (user) => {
 }
 
 module.exports = {
-    Model: () => User
+    Model: User
 }
