@@ -11,6 +11,8 @@ module.exports = UserModel => { return {
         UserModel.findAll().then(users => {
             res.json(users.map(user => {
                 return user.hideData(user);
+            }).filter(user => { 
+                return (req.isAdmin) ? true: !isAdmin(user);
             }))
         });
     },
