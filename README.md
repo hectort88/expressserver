@@ -5,7 +5,7 @@ Servidor de API de prueba implementado en ExpressJS
 * Clonar el repositorio
 * Ejecutar npm install para descargar las dependencias
 * Crear una base de datos en mysql con el archivo sql ubicado en conf/schema.sql
-* Copiar el archivo .env.example a .env
+* Copiar el archivo .env.example a .env (En este archivo se encuentra la configuracion de conexion a base de datos y el puerto del servicio)
 * Ejecutar node index.js y esperar a que muestre el mensaje: "Conectado a la base de datos"
 
 ## Dependencias
