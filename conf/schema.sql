@@ -25,7 +25,6 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `cedula` varchar(20) NOT NULL,
   `correo` varchar(100) NOT NULL,
   `password` varchar(100) NOT NULL,
-  `token` varchar(100) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deletedAt` datetime DEFAULT NULL,

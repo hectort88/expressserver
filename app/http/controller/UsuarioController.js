@@ -20,7 +20,13 @@ module.exports = UserModel => { return {
             if (user === null) return res.status(401).json({error: "Unauthorized"});
             if (user.isValidPassword(req.body.password, user)) {
                 let token = jwt.sign({admin: isAdmin(user)}, process.env.jwt_secret);
-                return res.json({token: token});
+                return res.json({
+                    token: token,
+                    nombres: user.nombres,
+                    apellidos: user.apellidos,
+                    correo: user.correo,
+                    id: user.id
+                });
             }
             return res.status(401).json({error: "Unauthorized"});
         })
@@ -31,11 +37,11 @@ module.exports = UserModel => { return {
         let user = UserModel.build(req.body);
         user.save()
             .then(user => res.json(user.hideData(user)))
-            .catch(error => { res.status(500).json({error: error}); });
+            .catch(error => { res.status(500).json(error); });
     },
 
     find: (req, res) => {
-        return res.json(req.user.hideData(req.user));        
+        return res.json(req.user.hideData(req.user));
     },
 
     update: (req, res) => {
@@ -46,17 +52,19 @@ module.exports = UserModel => { return {
             user.cedula = req.body.cedula || user.cedula;
             user.save()
                 .then(user => res.json(req.user.hideData(user)))
-                .catch(error => res.status(500).json({error: error}));
+                .catch(error => res.status(500).json(error));
+        } else {
+            return res.status(401).json({error: "Unauthorized"});
         }
-        return res.status(401).json({error: "Unauthorized"});
     },
 
     delete: (req, res) => {
         let user = req.user;
         if (req.isAdmin && !isAdmin(user)) {
             user.destroy({where: {id: req.params.id}})
-                .then(elem => { res.status(204).end({message: ok}); })
-                .catch(error => { res.status(500).json({error: error});});
+                .then(elem => { res.status(200).json({message: 'ok', usuario: elem}); }).catch(error => { 
+                    res.status(500).json({error: error});
+                });
         } else {
             return res.status(401).json({error: "Unauthorized"});
         }

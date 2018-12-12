@@ -39,7 +39,6 @@ const User = conn.define("usuarios", {
             notEmpty: true
         }
     },
-    token: db.sequelize.STRING,
     ultimoAcceso: db.sequelize.DATE,
 },
 {
