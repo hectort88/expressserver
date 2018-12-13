@@ -10,7 +10,7 @@ module.exports = UserModel => { return {
     getUsers: (req, res) => {
         UserModel.findAll().then(users => {
             res.json(users.map(user => {
-                return user.hideData(user);
+                return user.hideData();
             }).filter(user => { 
                 return (req.isAdmin) ? true: !isAdmin(user);
             }))
@@ -20,7 +20,7 @@ module.exports = UserModel => { return {
     auth: (req, res) => {
         UserModel.findOne({where: {correo: req.body.correo, deletedAt: null}}).then(user => {
             if (user === null) return res.status(401).json({error: "Unauthorized"});
-            if (user.isValidPassword(req.body.password, user)) {
+            if (user.isValidPassword(req.body.password)) {
                 let token = jwt.sign({admin: isAdmin(user)}, process.env.jwt_secret);
                 return res.json({
                     token: token,
@@ -38,12 +38,12 @@ module.exports = UserModel => { return {
         if (req.body.id) req.body.id = undefined;
         let user = UserModel.build(req.body);
         user.save()
-            .then(user => res.json(user.hideData(user)))
+            .then(user => res.json(user.hideData()))
             .catch(error => { res.status(500).json(error); });
     },
 
     find: (req, res) => {
-        return res.json(req.user.hideData(req.user));
+        return res.json(req.user.hideData());
     },
 
     update: (req, res) => {
@@ -53,7 +53,7 @@ module.exports = UserModel => { return {
             user.apellidos = req.body.apellidos || user.apellidos;
             user.cedula = req.body.cedula || user.cedula;
             user.save()
-                .then(user => res.json(req.user.hideData(user)))
+                .then(user => res.json(req.user.hideData()))
                 .catch(error => res.status(500).json(error));
         } else {
             return res.status(401).json({error: "Unauthorized"});

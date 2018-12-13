@@ -50,17 +50,24 @@ const User = conn.define("usuarios", {
     }
 });
 
-User.prototype.isValidPassword = (password, user) => {
-    return bcrypt.compareSync(password, user.password)
-};
 
-User.prototype.hideData = (user) => {
-    if (user === null) return user;
-    user.password = undefined;
-    user.token = undefined;
-    user.deletedAt = undefined;
-    return user;
-}
+(function() {
+    function isValidPassword(password) {
+        return bcrypt.compareSync(password, this.password)
+    }
+
+    function hideData() {
+        this.password = undefined;
+        this.token = undefined;
+        this.deletedAt = undefined;
+        return this;
+    }
+
+    isValidPassword.bind(User);
+    hideData.bind(User);
+    User.prototype.isValidPassword = isValidPassword;
+    User.prototype.hideData = hideData;
+})();
 
 module.exports = {
     Model: User
